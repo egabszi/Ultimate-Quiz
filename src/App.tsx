@@ -1,10 +1,11 @@
 import { useState } from "react"
 import WelcomeDescription from "./components/WelcomeDescription"
 import QuestionChoose from "./components/QuestionChoose"
-import QuestionsAndAnswers from "./components/QuestionsAndAnswers"
+import QuestionAndAnswers from "./components/QuestionAndAnswers"
+import { Questions, Result } from "./assets/interfaces"
 
 function App() {
-  const [questions, setQuestions] = useState([] as any)
+  const [questions, setQuestions] = useState({} as Questions)
   const [isSubmitted, setisSubmitted] = useState(false)
   const [questionIndex, setquestionIndex] = useState(0)
   const [answers, setAnswers] = useState([] as string[])
@@ -29,7 +30,6 @@ function App() {
     return ["True", "False"];
   }
 
-
   async function getQuestions() {
     const { categoryValue, difficultyValue, typeValue } = getValues();
 
@@ -49,13 +49,12 @@ function App() {
 
 
   function nextQuestion(answer: string) {
-    const currentQuestion = questions.results[questionIndex]
+    const currentQuestion = questions.results[questionIndex] as Result;
 
     if (questionIndex < 9) {
       const nextQuestion = questions.results[questionIndex + 1];
       const nextAnswers = nextQuestion.incorrect_answers.concat(nextQuestion.correct_answer);
 
-      setquestionIndex(questionIndex + 1);
       setAnswers(shuffleArray(nextAnswers));
     }
     if (answer === currentQuestion.correct_answer) {
@@ -69,14 +68,22 @@ function App() {
     <>
       <div className="w-[80%] h-[100%] bg-red-200 flex flex-col m-auto">
         <h1 className="text-4xl">Ultimate Quiz Challenge!</h1>
-        <QuestionChoose handleOnClick={getQuestions} />
+        <QuestionChoose
+          handleOnClick={getQuestions} />
         {questionIndex === 10 ?
           <h1>Your points: {correctAnswers}/10</h1> :
           (isSubmitted ?
-           <QuestionsAndAnswers questionIndex={questionIndex} questions={questions} answers={answers} nextQuestion={nextQuestion} correctAnswers={correctAnswers} /> :
+            <QuestionAndAnswers
+              questionIndex={questionIndex}
+              questions={questions}
+              answers={answers}
+              nextQuestion={nextQuestion}
+              correctAnswers={correctAnswers} /> :
             <WelcomeDescription />
           )}
       </div>
+
+      <button onClick={() => console.log(questions)}>asddasdad</button>
     </>
   )
 }
